@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VSP Finesse Tool</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a0a; --surface: #141414; --surface2: #1c1c1c; --border: #2a2a2a;
+      --text: #e8e8e8; --text2: #888; --accent: #4f9cf7; --green: #34d399;
+      --orange: #f59e0b; --red: #ef4444; --purple: #a78bfa; --pink: #f472b6;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+    header { margin-bottom: 24px; }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    header p { color: var(--text2); font-size: 13px; margin-top: 2px; }
+
+    .plan-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .plan-row .ps { font-size: 13px; }
+    .plan-row .ps .l { color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .plan-row .ps .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .tabs { display: flex; gap: 2px; margin-bottom: 20px; background: var(--surface); border-radius: 10px; padding: 3px; border: 1px solid var(--border); overflow-x: auto; }
+    .tab { padding: 9px 14px; border: none; background: transparent; color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; white-space: nowrap; transition: all 0.15s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: var(--surface2); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; }
+    .card:hover { border-color: #333; }
+    .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .card .loc { font-size: 13px; color: var(--text2); }
+    .card .meta { font-size: 12px; color: var(--text2); margin-top: 4px; }
+    .card .brands { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .tag { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+    .tag.hot { background: rgba(52,211,153,0.12); color: var(--green); border-color: rgba(52,211,153,0.25); }
+    .tag.want { background: rgba(244,114,182,0.12); color: var(--pink); border-color: rgba(244,114,182,0.25); }
+    .card .vsp-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 5px; font-weight: 600; margin-left: 6px; }
+    .vsp-yes { background: rgba(52,211,153,0.15); color: var(--green); }
+    .vsp-oon { background: rgba(245,158,11,0.15); color: var(--orange); }
+    .vsp-no { background: rgba(239,68,68,0.12); color: var(--red); }
+    .card .actions { margin-top: 8px; display: flex; gap: 10px; align-items: center; }
+    .card .actions a { font-size: 13px; color: var(--accent); text-decoration: none; }
+    .card .actions a:hover { text-decoration: underline; }
+    .card .note { font-size: 12px; color: var(--text2); margin-top: 6px; padding: 8px 10px; background: var(--surface2); border-radius: 6px; border-left: 2px solid var(--accent); }
+    .card .note.gold { border-left-color: var(--orange); }
+    .card .note.fire { border-left-color: var(--green); }
+
+    .callout { border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; font-size: 13px; }
+    .callout.blue { background: rgba(79,156,247,0.08); border: 1px solid rgba(79,156,247,0.2); }
+    .callout.green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); }
+    .callout.red { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+    .callout h4 { font-size: 13px; margin-bottom: 4px; font-weight: 600; }
+    .callout.blue h4 { color: var(--accent); }
+    .callout.green h4 { color: var(--green); }
+
+    .section { margin-bottom: 20px; }
+    .section > h2 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .section > .sub { font-size: 12px; color: var(--text2); margin-top: -8px; margin-bottom: 10px; }
+
+    /* Brand table */
+    .bt { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .bt th { padding: 6px 8px; color: var(--text2); font-weight: 500; text-align: left; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .bt td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
+    .bt tr:last-child td { border-bottom: none; }
+    .bt .bn { font-weight: 600; }
+
+    /* Calculator */
+    input, select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: var(--accent); }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .calc-grid { grid-template-columns: 1fr; } }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .field input, .field select { width: 100%; }
+    .brow { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .brow:last-child { border-bottom: none; }
+    .brow .l { color: var(--text2); }
+    .brow .v { font-weight: 500; font-variant-numeric: tabular-nums; }
+    .brow.total { font-size: 15px; font-weight: 700; padding-top: 10px; }
+    .brow.total .v { color: var(--green); }
+    .brow.sav .v { color: var(--accent); }
+
+    .cmp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 14px; }
+    .cmp { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+    .cmp .n { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .cmp .r { font-size: 11px; color: var(--text2); }
+    .cmp .p { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 3px; }
+    .cmp .o { font-size: 11px; color: var(--text2); margin-top: 1px; }
+
+    /* Search */
+    .search-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .search-bar input { flex: 1; min-width: 100px; }
+    button { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    button:hover { opacity: 0.85; }
+    .loading { text-align: center; padding: 30px; color: var(--text2); font-size: 13px; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 30px; color: var(--text2); font-size: 13px; }
+    .err { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; color: var(--red); font-size: 13px; margin-bottom: 10px; }
+    .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; }
+    .pcard:hover { border-color: #333; }
+    .pcard h3 { font-size: 14px; font-weight: 600; }
+    .pcard .a { font-size: 12px; color: var(--text2); }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>VSP Finesse Tool</h1>
+    <p>Researched opticians in Manhattan + Brooklyn that carry your brands and take VSP</p>
+  </header>
+
+  <div class="plan-row">
+    <div class="ps"><div class="l">Allowance</div><div class="v" style="color:var(--green)">$130</div></div>
+    <div class="ps"><div class="l">Overage</div><div class="v" style="color:var(--accent)">20% off</div></div>
+    <div class="ps"><div class="l">Copays</div><div class="v">$25 frame / $25 lens</div></div>
+    <div class="ps"><div class="l">Frame Cycle</div><div class="v" style="color:var(--orange)">Every 2 yrs</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="picks">Best Picks</button>
+    <button class="tab" data-tab="bk">Brooklyn</button>
+    <button class="tab" data-tab="brands">Brand Guide</button>
+    <button class="tab" data-tab="calc">Calculator</button>
+    <button class="tab" data-tab="search">VSP Search</button>
+  </div>
+
+  <!-- ============ BEST PICKS ============ -->
+  <div id="picks" class="panel active">
+    <div class="callout green">
+      <h4>TL;DR — Your Best Moves</h4>
+      <p><strong>For Gucci/BV/Prada:</strong> Milan Optique (Brooklyn, VSP only) or LensCrafters (Gucci + BV confirmed). <strong>For Chrome Hearts:</strong> Optical Illusions. <strong>For the Reddit hack:</strong> Eurovision Optical (Broadway & 37th). <strong>Best overall selection + VSP:</strong> Studio Optix (5,000+ frames, Loewe, Chanel, Tom Ford).</p>
+    </div>
+
+    <div class="section">
+      <h2>Confirmed: VSP In-Network + Carry Designer Brands</h2>
+      <p class="sub">Verified via VSP API, store websites, Yelp, and web research</p>
+
+      <div class="card">
+        <h3>Milan Optique <span class="vsp-badge vsp-yes">VSP (only insurance accepted)</span></h3>
+        <div class="loc">83 5th Ave, Park Slope, Brooklyn 11217</div>
+        <div class="meta">485 reviews on Yelp · Since 2008 · Owner: Vlad Kagan</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span>
+          <span class="tag want">YSL / Saint Laurent</span>
+          <span class="tag want">Tom Ford</span>
+          <span class="tag want">Dita</span>
+          <span class="tag want">Oliver Peoples</span>
+          <span class="tag">Cartier</span>
+          <span class="tag">D&G</span>
+          <span class="tag">Tiffany & Co.</span>
+          <span class="tag">Ray-Ban</span>
+        </div>
+        <div class="note fire">Brooklyn, VSP-only shop, confirmed Gucci + YSL + Dita + Oliver Peoples + Tom Ford. This is probably your #1 move. Japanese titanium, custom fitting. 30% off sunglasses as second pair with VSP.</div>
+        <div class="actions">
+          <a href="https://www.yelp.com/biz/milan-optique-brooklyn" target="_blank">Yelp</a>
+          <a href="https://milanoptiquenyc.com/" target="_blank">Website</a>
+          <a href="https://maps.google.com/?q=83+5th+Ave+Brooklyn+NY" target="_blank">Map</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Studio Optix <span class="vsp-badge vsp-yes">VSP Premier Edge</span></h3>
+        <div class="loc">63 W 49th St, Rockefeller Center, Manhattan 10112</div>
+        <div class="meta">5,000+ frames from 100+ manufacturers · Accepts VSP + many plans</div>
+        <div class="brands">
+          <span class="tag want">Loewe</span>
+          <span class="tag want">Tom Ford</span>
+          <span class="tag want">Chanel</span>
+          <span class="tag">Francis Klein</span>
+          <span class="tag">+ 100 more brands</span>
+        </div>
+        <div class="note fire">Largest frame selection in NYC. Confirmed Loewe, Chanel, Tom Ford. With 100+ manufacturers they very likely carry Kering brands too. VSP Premier Edge = enhanced benefits. In-house doctors + glasses in one visit.</div>
+        <div class="actions">
+          <a href="https://www.studiooptix.com/" target="_blank">Website</a>
+          <a href="https://maps.google.com/?q=63+W+49th+St+NYC" target="_blank">Map</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Eurovision Optical <span class="vsp-badge vsp-yes">VSP In-Network</span></h3>
+        <div class="loc">107 W 37th St Suite C, Garment District, Manhattan 10018</div>
+        <div class="meta">4.5 stars · 59 reviews on Yelp · Dr. David Haddad · Walk-ins OK</div>
+        <div class="brands">
+          <span class="tag hot">Can order ANY designer frame</span>
+        </div>
+        <div class="note gold">This is the "Broadway & 37th" spot from the Reddit thread. The optician will order you any designer glasses you want and bill your insurance. Free eye exam with insurance. Not a fancy office but gets the job done — "girlmath free Bottega's" per Reddit. Mon-Fri 9am-5:30pm.</div>
+        <div class="actions">
+          <a href="tel:2125642112">212-564-2112</a>
+          <a href="https://www.yelp.com/biz/eurovision-optical-new-york-2" target="_blank">Yelp</a>
+          <a href="https://www.eurovisionoptical.com/" target="_blank">Website</a>
+          <a href="https://maps.google.com/?q=107+W+37th+St+NYC" target="_blank">Map</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Eyes on Broadway <span class="vsp-badge vsp-yes">VSP + EyeMed + Spectera</span></h3>
+        <div class="loc">680 Broadway, NoHo, Manhattan 10012</div>
+        <div class="meta">88 reviews on Yelp · Since 1995 · In-house custom lens lab</div>
+        <div class="brands">
+          <span class="tag want">Dita</span>
+          <span class="tag want">Tom Ford</span>
+          <span class="tag want">Oliver Peoples</span>
+          <span class="tag">Lindberg</span>
+          <span class="tag">Bevel</span>
+          <span class="tag">Lafont</span>
+          <span class="tag">Ray-Ban</span>
+        </div>
+        <div class="note">NoHo location, VSP confirmed, carries Dita + Tom Ford + Oliver Peoples. Specializes in latest designers. Has sister store Eyes on the World on Lexington Ave (also VSP).</div>
+        <div class="actions">
+          <a href="tel:2126140069">212-614-0069</a>
+          <a href="https://eyesonny.com/" target="_blank">Website</a>
+          <a href="https://maps.google.com/?q=680+Broadway+NYC" target="_blank">Map</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Cohen's Fashion Optical <span class="vsp-badge vsp-yes">VSP + many plans</span></h3>
+        <div class="loc">Multiple NYC locations (W 57th, Lexington, Union Sq, UWS, etc.)</div>
+        <div class="meta">Major chain · Accepts VSP, Davis Vision, EyeMed, GVS, NVA, Spectera</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span>
+          <span class="tag want">Bottega Veneta</span>
+          <span class="tag">Cartier</span>
+          <span class="tag">Dior</span>
+          <span class="tag">Dita</span>
+          <span class="tag">Ray-Ban</span>
+          <span class="tag">Versace</span>
+          <span class="tag">Prada</span>
+        </div>
+        <div class="note">Confirmed Gucci + Bottega Veneta + Dior + Cartier. Multiple locations, easy access. Park Slope Brooklyn location at 298 7th Ave too.</div>
+        <div class="actions">
+          <a href="tel:2125814967">212-581-4967</a>
+          <a href="https://www.cohensfashionoptical.com/" target="_blank">Website</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>LensCrafters <span class="vsp-badge vsp-yes">VSP In-Network</span></h3>
+        <div class="loc">Multiple NYC + Brooklyn locations</div>
+        <div class="meta">Owned by Luxottica/EssilorLuxottica · Huge inventory</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span>
+          <span class="tag want">Bottega Veneta</span>
+          <span class="tag want">Prada</span>
+          <span class="tag">Versace</span>
+          <span class="tag">Burberry</span>
+          <span class="tag">Dolce & Gabbana</span>
+          <span class="tag">Ray-Ban</span>
+          <span class="tag">Oliver Peoples</span>
+          <span class="tag">Tom Ford</span>
+        </div>
+        <div class="note">Easiest play. Walk in, pick Gucci/BV/Prada, use VSP. Luxottica owns the store AND carries Kering brands (Gucci, BV confirmed on lenscrafters.com). Available nationwide.</div>
+        <div class="actions">
+          <a href="https://www.lenscrafters.com/lc-us/brands/gucci" target="_blank">Gucci @ LC</a>
+          <a href="https://www.lenscrafters.com/lc-us/brands/bottega-veneta" target="_blank">BV @ LC</a>
+          <a href="https://www.lenscrafters.com/" target="_blank">Find Location</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Hamilton Plaza Vision <span class="vsp-badge vsp-yes">VSP + many plans</span></h3>
+        <div class="loc">Park Slope, Brooklyn</div>
+        <div class="meta">30+ years · Accepts VSP, EyeMed, Davis, Medicare, Medicaid, HMOs</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span>
+          <span class="tag want">Tom Ford</span>
+          <span class="tag want">Prada</span>
+          <span class="tag">Ray-Ban</span>
+          <span class="tag">D&G</span>
+          <span class="tag">Oakley</span>
+          <span class="tag">Roberto Cavalli</span>
+        </div>
+        <div class="note">Brooklyn, confirmed Gucci + Prada + Tom Ford with VSP. Also does Varilux, Transitions, Crizal lenses.</div>
+        <div class="actions">
+          <a href="https://hamiltonplazavision.com/" target="_blank">Website</a>
+          <a href="https://maps.google.com/?q=Hamilton+Plaza+Vision+Park+Slope+Brooklyn" target="_blank">Map</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Park Slope Eye <span class="vsp-badge vsp-yes">VSP + EyeMed</span></h3>
+        <div class="loc">Union St & 5th Ave, Park Slope, Brooklyn</div>
+        <div class="meta">Optical boutique vibe</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span>
+          <span class="tag">Chloé</span>
+          <span class="tag">MODO</span>
+          <span class="tag">Masunaga</span>
+          <span class="tag">Dandys</span>
+          <span class="tag">Zero G</span>
+          <span class="tag">lowercase</span>
+        </div>
+        <div class="note">Brooklyn boutique, Gucci confirmed on their site. Mix of luxury + indie brands. VSP members get 20% off unlimited additional pairs within 12 months.</div>
+        <div class="actions">
+          <a href="https://parkslopeeye.com/" target="_blank">Website</a>
+          <a href="https://parkslopeeye.com/brands/eyeglass-frames-and-lenses/" target="_blank">Brands</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BROOKLYN ============ -->
+  <div id="bk" class="panel">
+    <div class="section">
+      <h2>Brooklyn — VSP In-Network with Designer Frames</h2>
+
+      <div class="card">
+        <h3>Milan Optique <span class="vsp-badge vsp-yes">VSP Only</span></h3>
+        <div class="loc">83 5th Ave, Park Slope 11217</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span><span class="tag want">YSL</span><span class="tag want">Dita</span>
+          <span class="tag want">Oliver Peoples</span><span class="tag want">Tom Ford</span>
+          <span class="tag">Cartier</span><span class="tag">D&G</span><span class="tag">Tiffany</span><span class="tag">Ray-Ban</span>
+        </div>
+        <div class="actions"><a href="https://www.yelp.com/biz/milan-optique-brooklyn" target="_blank">Yelp (485 reviews)</a> <a href="https://milanoptiquenyc.com/" target="_blank">Website</a></div>
+      </div>
+
+      <div class="card">
+        <h3>Hamilton Plaza Vision <span class="vsp-badge vsp-yes">VSP + many</span></h3>
+        <div class="loc">Park Slope, Brooklyn</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span><span class="tag want">Prada</span><span class="tag want">Tom Ford</span>
+          <span class="tag">Ray-Ban</span><span class="tag">D&G</span><span class="tag">Oakley</span>
+        </div>
+        <div class="actions"><a href="https://hamiltonplazavision.com/" target="_blank">Website</a></div>
+      </div>
+
+      <div class="card">
+        <h3>Park Slope Eye <span class="vsp-badge vsp-yes">VSP + EyeMed</span></h3>
+        <div class="loc">Union St & 5th Ave, Park Slope</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span><span class="tag">Chloé</span><span class="tag">MODO</span><span class="tag">Masunaga</span><span class="tag">Zero G</span>
+        </div>
+        <div class="actions"><a href="https://parkslopeeye.com/" target="_blank">Website</a></div>
+      </div>
+
+      <div class="card">
+        <h3>Cohen's Fashion Optical — Park Slope <span class="vsp-badge vsp-yes">VSP</span></h3>
+        <div class="loc">298 7th Ave, Park Slope, Brooklyn</div>
+        <div class="brands">
+          <span class="tag want">Gucci</span><span class="tag want">Bottega Veneta</span><span class="tag want">Prada</span><span class="tag">Dior</span><span class="tag">Ray-Ban</span>
+        </div>
+        <div class="actions"><a href="https://www.cohensfashionoptical.com/locations/298-7th-ave/" target="_blank">Website</a></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Brooklyn — Worth Visiting (Not VSP In-Network)</h2>
+
+      <div class="card">
+        <h3>Atelier Mira <span class="vsp-badge vsp-oon">Out-of-Network Only</span></h3>
+        <div class="loc">193 Grand St, Williamsburg 11211</div>
+        <div class="meta">Eye exams: $105 · Mon-Sat · 718-747-8844</div>
+        <div class="brands">
+          <span class="tag">Anne et Valentin</span><span class="tag">Ahlem</span><span class="tag">Jacques Marie Mage</span>
+          <span class="tag">Kuboraum</span><span class="tag">Lapima</span><span class="tag">Thierry Lasry</span>
+          <span class="tag">Port Tanger</span><span class="tag">Rigards</span><span class="tag">Eyevan</span>
+        </div>
+        <div class="note gold">The 12-year ophthalmology veteran from Reddit recommends this as "limitless budget" tier. Handcrafted art-forward European eyewear. Submit OON claim for $70 frame reimbursement.</div>
+        <div class="actions">
+          <a href="tel:7187478844">718-747-8844</a>
+          <a href="https://www.ateliermira.com/" target="_blank">Website</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Eye Shoppe on 7th <span class="vsp-badge vsp-oon">FSA/Flex Only</span></h3>
+        <div class="loc">133 7th Ave, Park Slope 11215</div>
+        <div class="meta">20+ years in Park Slope · 718-789-3322</div>
+        <div class="brands">
+          <span class="tag">Jacques Marie Mage</span><span class="tag">Anne et Valentin</span><span class="tag">Mykita</span>
+          <span class="tag">Kuboraum</span><span class="tag">Face A Face</span><span class="tag">Kirk & Kirk</span>
+          <span class="tag">Ahlem</span><span class="tag">Theo</span><span class="tag">Eyevan</span><span class="tag">Factory900</span>
+          <span class="tag">Blake Kuwahara</span><span class="tag">Garrett Leight</span><span class="tag">Etnia Barcelona</span>
+          <span class="tag">l.a.Eyeworks</span><span class="tag">Bevel</span><span class="tag">Piero Massaro</span>
+        </div>
+        <div class="note">Incredible indie/designer selection. No confirmed VSP but takes FSA. Fashion-forward Park Slope staple.</div>
+        <div class="actions">
+          <a href="tel:7187893322">718-789-3322</a>
+          <a href="https://eyeshoppe7th.com/" target="_blank">Website</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Moscot — Brooklyn <span class="vsp-badge vsp-oon">VSP Out-of-Network</span></h3>
+        <div class="loc">Cobble Hill, Brooklyn (also LES, West Village, UWS)</div>
+        <div class="meta">NYC institution since 1915</div>
+        <div class="brands"><span class="tag">Moscot (house brand)</span></div>
+        <div class="note gold">OON VSP = 25-35% off in-store + you submit claim for reimbursement. $50 credit for new patient eye exam. Classic NYC heritage frames. Can use FSA/HSA.</div>
+        <div class="actions">
+          <a href="https://moscot.com/" target="_blank">Website</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BRANDS ============ -->
+  <div id="brands" class="panel">
+    <div class="section">
+      <h2>Designer Brand Cheat Sheet</h2>
+      <div style="overflow-x:auto;">
+        <table class="bt">
+          <thead><tr><th>Brand</th><th>Made By</th><th>Frames</th><th>VSP Ease</th><th>Where to Buy w/ VSP</th></tr></thead>
+          <tbody>
+            <tr><td class="bn">Gucci (Demna)</td><td>Kering</td><td>$350–600</td><td style="color:var(--green)">Easy</td><td>LensCrafters, Milan Optique, Cohen's, Hamilton Plaza, Park Slope Eye</td></tr>
+            <tr><td class="bn">Bottega Veneta</td><td>Kering</td><td>$350–500</td><td style="color:var(--green)">Easy</td><td>LensCrafters (confirmed), Cohen's</td></tr>
+            <tr><td class="bn">Balenciaga</td><td>Kering</td><td>$300–500</td><td style="color:var(--orange)">Medium</td><td>Eurovision Optical (can order), Studio Optix (likely)</td></tr>
+            <tr><td class="bn">Saint Laurent</td><td>Kering</td><td>$300–480</td><td style="color:var(--green)">Easy</td><td>Milan Optique (confirmed YSL), Cohen's, Eurovision</td></tr>
+            <tr><td class="bn">Prada</td><td>Luxottica</td><td>$300–500+</td><td style="color:var(--green)">Easy</td><td>LensCrafters, Hamilton Plaza, Cohen's, Eyeconic.com</td></tr>
+            <tr><td class="bn">Tom Ford</td><td>Marcolin</td><td>$350–550</td><td style="color:var(--green)">Easy</td><td>Milan Optique, Eyes on Broadway, Studio Optix, Hamilton Plaza, Cohen's</td></tr>
+            <tr><td class="bn">Loewe</td><td>Kering</td><td>$350–550</td><td style="color:var(--green)">Easy</td><td>Studio Optix (confirmed)</td></tr>
+            <tr><td class="bn">Chanel</td><td>Luxottica</td><td>$400–700</td><td style="color:var(--orange)">Medium</td><td>Studio Optix (confirmed)</td></tr>
+            <tr><td class="bn">Dita</td><td>In-house</td><td>$400–800</td><td style="color:var(--green)">Easy</td><td>Milan Optique, Eyes on Broadway, Cohen's</td></tr>
+            <tr><td class="bn">Oliver Peoples</td><td>Luxottica</td><td>$350–550</td><td style="color:var(--green)">Easy</td><td>Milan Optique, Eyes on Broadway, LensCrafters</td></tr>
+            <tr><td class="bn">Chrome Hearts</td><td>In-house</td><td>$500–2000+</td><td style="color:var(--red)">Hard</td><td>Optical Illusions (Platinum VSP), Chinatown Optical</td></tr>
+            <tr><td class="bn">Gentle Monster</td><td>In-house</td><td>$230–350</td><td style="color:var(--red)">Hard</td><td>Eurovision (can order), buy at 70 Wooster + OON claim</td></tr>
+            <tr><td class="bn">Jacques Marie Mage</td><td>In-house</td><td>$500–900</td><td style="color:var(--red)">Hard</td><td>Eye Shoppe 7th (no VSP), Atelier Mira (OON only)</td></tr>
+            <tr><td class="bn">ERL</td><td>—</td><td>N/A</td><td style="color:var(--text2)">N/A</td><td>No prescription optical line</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <h4>Key Insight: LensCrafters Has Gucci + Bottega</h4>
+      <p>Plot twist — LensCrafters.com literally has Gucci and Bottega Veneta pages. Luxottica owns LensCrafters AND has distribution for Kering brands. You can walk into any LensCrafters, pick Gucci or BV frames, and use VSP. It's the easiest path.</p>
+    </div>
+
+    <div class="callout blue">
+      <h4>The Eurovision Hack (from Reddit)</h4>
+      <p>Eurovision Optical at 107 W 37th St will order ANY designer frame for you and bill VSP directly. Not a fancy office but this is the "girlmath free Bottega's" move. They'll order Gucci, BV, Gentle Monster, whatever — you just need your VSP info. Walk-ins welcome, Mon-Fri 9-5:30.</p>
+    </div>
+
+    <div class="section">
+      <h2>Blue Light Lenses</h2>
+      <div class="card">
+        <div class="note">VSP covers standard single-vision or progressive lenses with $25 copay. Blue light coating (Crizal Prevencia, Eyezen, etc.) may be an extra $15-75 depending on your plan. Ask for it when ordering — most in-network providers offer it. The key lens brands for blue light: Crizal Prevencia, Zeiss DuraVision BlueProtect, Hoya Blue Control.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CALCULATOR ============ -->
+  <div id="calc" class="panel">
+    <div class="calc-grid">
+      <div class="card">
+        <h3 style="margin-bottom:12px;">Frame Details</h3>
+        <div class="field"><label>Frame Retail Price</label><input type="number" id="fp" value="450" min="0" step="10" oninput="calc()"></div>
+        <div class="field"><label>Purchase Type</label>
+          <select id="pt" onchange="calc()">
+            <option value="in">In-Network</option>
+            <option value="oon">Out-of-Network</option>
+            <option value="own">Buy frames separately (lenses only)</option>
+          </select>
+        </div>
+        <div class="field"><label>Frame Allowance</label><input type="number" id="al" value="130" min="0" step="10" oninput="calc()"></div>
+        <div class="field"><label>Using FSA/HSA?</label>
+          <select id="fsa" onchange="calc()"><option value="0">No</option><option value="1">Yes (~30% tax savings)</option></select>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;">Cost Breakdown</h3>
+        <div id="bd"></div>
+      </div>
+    </div>
+    <h3 style="font-size:14px;font-weight:600;margin-top:18px;">Quick Compare — Your Target Brands</h3>
+    <div class="cmp-grid" id="cg"></div>
+  </div>
+
+  <!-- ============ VSP SEARCH ============ -->
+  <div id="search" class="panel">
+    <div class="callout blue">
+      <h4>Live VSP API Search</h4>
+      <p>Queries VSP's provider API directly. Brand tags only show VSP partner brands — providers carry way more. Check the Best Picks tab for the researched list.</p>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="zip" placeholder="ZIP code" value="11215" maxlength="5">
+      <select id="net"><option value="Choice">Choice</option><option value="Signature">Signature</option></select>
+      <button onclick="doSearch()">Search</button>
+    </div>
+    <div id="sr"><div class="empty">Enter a ZIP and search</div></div>
+  </div>
+</div>
+
+<script>
+const BM={MA:'Airlock',AK:'Anne Klein',BB:'bebe',KC:'Calvin Klein',CJ:'CK Jeans',CA:'Canada Goose',CO:'Cole Haan',CS:'Columbia',CV:'Converse',CG:'Cutler & Gross',DK:'DKNY',DR:'Dragon',DJ:'Draper James',SF:'Ferragamo',FL:'Flexon',LF:'Karl Lagerfeld',KS:'Kendra Scott',LA:'Lacoste',LW:'Linda Farrow',LC:'Longchamp',M:'Marchon',N:'Nautica',NI:'Nike',AA:'Nine West',PS:'Paul Smith',PR:'Pure',SP:'Spyder',LZ:'Zeiss'};
+function tc(s){return s?s.split(' ').map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join(' '):''}
+function fp(p){if(!p)return'';const d=p.replace(/\D/g,'');return d.length===10?d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6):p}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active');
+}));
+
+// Calc
+function calc(){
+  const p=+document.getElementById('fp').value||0,loc=document.getElementById('pt').value;
+  const a=+document.getElementById('al').value||0,f=+document.getElementById('fsa').value,tx=0.30;
+  const bd=document.getElementById('bd');let rows=[];
+  if(loc==='in'){
+    const ov=Math.max(0,p-a),d=ov*0.2,oop=ov-d+50,eff=f?oop*(1-tx):oop;
+    rows=[{l:'Frame retail',v:'$'+p},{l:'VSP allowance',v:'-$'+a,c:'sav'},{l:'Overage',v:'$'+ov},
+      {l:'20% discount',v:'-$'+Math.round(d),c:'sav'},{l:'Copays',v:'$50'},
+      {l:'Total saved',v:'$'+Math.round(a+d),c:'sav'}];
+    if(f){rows.push({l:'FSA/HSA savings',v:'-$'+Math.round(oop*tx),c:'sav'});rows.push({l:'Effective cost',v:'$'+Math.round(eff),c:'total'});}
+    else rows.push({l:'You pay',v:'$'+Math.round(oop),c:'total'});
+  }else if(loc==='oon'){
+    const oop=p-70,eff=f?oop*(1-tx):oop;
+    rows=[{l:'Frame retail',v:'$'+p},{l:'OON reimbursement',v:'-$70',c:'sav'}];
+    if(f){rows.push({l:'FSA/HSA savings',v:'-$'+Math.round(oop*tx),c:'sav'});rows.push({l:'Effective cost',v:'$'+Math.round(eff),c:'total'});}
+    else rows.push({l:'You pay',v:'$'+Math.round(oop),c:'total'});
+  }else{
+    const oop=p+25,eff=f?oop*(1-tx):oop;
+    rows=[{l:'Frame (no VSP)',v:'$'+p},{l:'Lens copay',v:'$25'},{l:'Allowance',v:'Unused'}];
+    if(f){rows.push({l:'FSA/HSA savings',v:'-$'+Math.round(oop*tx),c:'sav'});rows.push({l:'Effective cost',v:'$'+Math.round(eff),c:'total'});}
+    else rows.push({l:'You pay',v:'$'+Math.round(oop),c:'total'});
+  }
+  bd.innerHTML=rows.map(r=>`<div class="brow ${r.c||''}"><span class="l">${r.l}</span><span class="v">${r.v}</span></div>`).join('');
+  // Compare
+  const al=+document.getElementById('al').value||130,fs=+document.getElementById('fsa').value;
+  const frames=[
+    {n:'Gentle Monster',p:300},{n:'Saint Laurent',p:380},{n:'Balenciaga',p:400},
+    {n:'Gucci',p:450},{n:'Bottega Veneta',p:450},{n:'Prada',p:400},
+    {n:'Loewe',p:450},{n:'Tom Ford',p:450},{n:'Dita',p:600},
+    {n:'Oliver Peoples',p:400},{n:'Chanel',p:550},{n:'Chrome Hearts',p:700}
+  ];
+  document.getElementById('cg').innerHTML=frames.map(f=>{
+    const ov=Math.max(0,f.p-al),t=ov-ov*0.2+50,e=fs?Math.round(t*0.7):Math.round(t);
+    return`<div class="cmp"><div class="n">${f.n}</div><div class="r">Retail: $${f.p}</div><div class="p">In-network: $${e}${fs?' (FSA)':''}</div><div class="o">OON: $${f.p-70}</div></div>`;
+  }).join('');
+}
+calc();
+
+// Search
+async function doSearch(){
+  const z=document.getElementById('zip').value.trim();if(!z||z.length!==5)return;
+  const n=document.getElementById('net').value,sr=document.getElementById('sr');
+  sr.innerHTML='<div class="loading"><div class="spinner"></div>Searching VSP...</div>';
+  try{
+    const r=await fetch('https://api.vspglobal.com/fadbusiness-api/publiclocationsummarybusextensions',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({searchType:'RADIUS',zip:z,networkNames:[n],locationType:['VSP','Affiliate'],includePremierFields:true,offset:'1',limit:'40'})
+    });
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json(),locs=d.locations||[];
+    if(!locs.length){sr.innerHTML='<div class="empty">No providers found</div>';return;}
+    sr.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">${locs.length} of ${d.totalCounts||locs.length} providers</div>`+
+      locs.map(l=>{
+        const a=l.addr||{},st=tc(a.street1||''),ct=tc(a.city||''),addr=[st,ct,a.stateCode,a.zipCode].filter(Boolean).join(', ');
+        const dist=l.distance?parseFloat(l.distance).toFixed(1)+' mi':'';
+        const docs=(l.providerSummaries||[]).map(d=>{const n=[d.first,d.last].filter(v=>v&&v.trim()).join(' ');return n?`<strong>${n}</strong>${d.degree?', '+d.degree:''}`:null}).filter(Boolean).join(' · ');
+        const brands=(l.frameBrandCds||[]).map(c=>`<span class="tag">${BM[c]||c}</span>`).join('');
+        const links=[];
+        if(l.phone)links.push(`<a href="tel:${l.phone}">${fp(l.phone)}</a>`);
+        if(l.websiteUrl)links.push(`<a href="${l.websiteUrl}" target="_blank">Web</a>`);
+        const prem=(l.premierTierName&&!['Network','Non-Eligible','Net Dev Excluded'].includes(l.premierTierName))?`<span class="vsp-badge vsp-yes" style="font-size:10px">${l.premierTierName}</span>`:'';
+        return`<div class="pcard"><h3>${l.name||'Unknown'}${prem}</h3><div class="a">${addr}${dist?' · '+dist:''}</div>${brands?'<div class="brands" style="margin-top:6px">'+brands+'</div>':''}${docs?'<div style="font-size:12px;color:var(--text2);margin-top:4px">'+docs+'</div>':''}${links.length?'<div style="margin-top:6px;display:flex;gap:10px">'+links.map(l=>'<span style="font-size:12px">'+l+'</span>').join('')+'</div>':''}</div>`;
+      }).join('');
+  }catch(e){
+    sr.innerHTML=`<div class="err">VSP API error: ${e.message}. May be CORS — try <a href="https://www.vsp.com/eye-doctor" target="_blank" style="color:var(--accent)">vsp.com/eye-doctor</a> directly.</div>`;
+  }
+}
+</script>
+</body>
+</html>
