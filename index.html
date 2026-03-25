@@ -622,6 +622,16 @@
 
   <!-- ============ BRANDS ============ -->
   <div id="brands" class="panel">
+
+    <div class="section">
+      <h2>The Jas Search</h2>
+      <p class="sub">Search any brand — see which VSP-friendly stores carry it and what you'd pay</p>
+      <div style="position:relative;">
+        <input type="text" id="jasInput" placeholder="Search a brand (e.g. Gucci, Prada, Dior...)" style="width:100%;padding:12px 16px;font-size:15px;border-radius:10px;" oninput="jasSearch()">
+      </div>
+      <div id="jasResults" style="margin-top:12px;"></div>
+    </div>
+
     <div class="section">
       <h2>Designer Brand Cheat Sheet</h2>
       <div style="overflow-x:auto;">
@@ -709,6 +719,67 @@
 
 <script>
 const BM={MA:'Airlock',AK:'Anne Klein',BB:'bebe',KC:'Calvin Klein',CJ:'CK Jeans',CA:'Canada Goose',CO:'Cole Haan',CS:'Columbia',CV:'Converse',CG:'Cutler & Gross',DK:'DKNY',DR:'Dragon',DJ:'Draper James',SF:'Ferragamo',FL:'Flexon',LF:'Karl Lagerfeld',KS:'Kendra Scott',LA:'Lacoste',LW:'Linda Farrow',LC:'Longchamp',M:'Marchon',N:'Nautica',NI:'Nike',AA:'Nine West',PS:'Paul Smith',PR:'Pure',SP:'Spyder',LZ:'Zeiss'};
+
+// ============ JAS SEARCH ============
+const JAS_DB = [
+  // Stores with their brands + VSP status
+  {store:'Milan Optique',loc:'83 5th Ave, Park Slope, Brooklyn',vsp:true,phone:'',url:'https://milanoptiquenyc.com/',brands:['Gucci','Saint Laurent','YSL','Tom Ford','Dita','Oliver Peoples','Cartier','Dolce & Gabbana','D&G','Tiffany','Tiffany & Co.','Ray-Ban']},
+  {store:'Studio Optix',loc:'63 W 49th St, Rockefeller Center',vsp:true,phone:'',url:'https://www.studiooptix.com/',brands:['Loewe','Tom Ford','Chanel','Francis Klein','Lindberg','Mykita','ic! berlin','Matsuda'],note:'5,000+ frames from 100+ manufacturers — if a brand exists in wholesale, they probably carry it'},
+  {store:'Eurovision Optical',loc:'107 W 37th St, Garment District',vsp:true,phone:'212-564-2112',url:'https://www.eurovisionoptical.com/',brands:['Gucci','Bottega Veneta','Balenciaga','Saint Laurent','YSL','Prada','Tom Ford','Dior','Versace','Ray-Ban','Oliver Peoples','Dita','Fendi','Burberry'],note:'Can order ANY brand from standard wholesale distributors. The Reddit hack — bills VSP directly.'},
+  {store:'Eyes on Broadway',loc:'680 Broadway, NoHo',vsp:true,phone:'212-614-0069',url:'https://eyesonny.com/',brands:['Dita','Tom Ford','Oliver Peoples','Lindberg','Bevel','Lafont','Ray-Ban']},
+  {store:'Eyes on the World',loc:'645 Lexington Ave, Midtown East',vsp:true,phone:'212-355-8494',url:'https://eyesonny.com/',brands:['Dita','Tom Ford','Oliver Peoples','Lindberg','Bevel','Lafont','Ray-Ban']},
+  {store:"Cohen's Fashion Optical",loc:'Multiple NYC + Brooklyn locations',vsp:true,phone:'212-581-4967',url:'https://www.cohensfashionoptical.com/',brands:['Gucci','Bottega Veneta','Prada','Cartier','Dior','Dita','Ray-Ban','Versace','Dolce & Gabbana','D&G','Burberry','Tiffany']},
+  {store:'LensCrafters',loc:'Multiple NYC + Brooklyn',vsp:true,phone:'',url:'https://www.lenscrafters.com/',brands:['Gucci','Bottega Veneta','Prada','Versace','Burberry','Dolce & Gabbana','D&G','Ray-Ban','Oliver Peoples','Tom Ford','Coach','Michael Kors','Tory Burch','Oakley','Armani','Giorgio Armani','Emporio Armani','Valentino','Miu Miu','Persol','Ralph Lauren','Polo','Vogue']},
+  {store:'Hamilton Plaza Vision',loc:'Park Slope, Brooklyn',vsp:true,phone:'',url:'https://hamiltonplazavision.com/',brands:['Gucci','Prada','Tom Ford','Ray-Ban','Dolce & Gabbana','D&G','Oakley','Roberto Cavalli']},
+  {store:'Park Slope Eye',loc:'Union St & 5th Ave, Park Slope',vsp:true,phone:'',url:'https://parkslopeeye.com/',brands:['Gucci','Chloé','Chloe','MODO','Masunaga','Dandys','Zero G','lowercase','Eco']},
+  {store:'EuroOptica',loc:'280 Columbus Ave (UWS) + 1249 3rd Ave (UES)',vsp:false,phone:'212-501-7070',url:'https://www.eurooptica.com/',brands:['Gucci','Bottega Veneta','Balenciaga','Saint Laurent','YSL','Andy Wolf','Anne et Valentin','Barton Perreira','Face A Face','ic! berlin','Lindberg','Mykita','Oliver Peoples','Oliver Goldsmith','Ray-Ban','Sabine Be','Theo','Kirk & Kirk']},
+  {store:'Chinatown Optical',loc:'40 Mott St, Chinatown',vsp:false,phone:'212-267-1260',url:'https://chinatownoptical.com/',brands:['Chrome Hearts','Gucci','Prada','Burberry','Chanel','Dita','ic! berlin','Lindberg','Linda Farrow','Matsuda','Oliver Peoples','Persol']},
+  {store:'Atelier Mira',loc:'193 Grand St, Williamsburg, Brooklyn',vsp:false,phone:'718-747-8844',url:'https://www.ateliermira.com/',brands:['Anne et Valentin','Ahlem','Jacques Marie Mage','Kuboraum','Lapima','Masahiromaruyama','Max Pittion','Rigards','Thierry Lasry','Port Tanger','Eyevan','District Vision']},
+  {store:'Eye Shoppe on 7th',loc:'133 7th Ave, Park Slope, Brooklyn',vsp:false,phone:'718-789-3322',url:'https://eyeshoppe7th.com/',brands:['Bevel','Kirk & Kirk','Jacques Marie Mage','Face A Face','Kuboraum','Blake Kuwahara','l.a.Eyeworks','LA Eyeworks','Mykita','Anne et Valentin','Theo','Eyevan','Factory900','Ahlem','Etnia Barcelona','Garrett Leight','Piero Massaro']},
+  {store:'Moscot',loc:'Multiple NYC (LES, West Village, Cobble Hill, UWS)',vsp:false,phone:'',url:'https://moscot.com/',brands:['Moscot'],note:'VSP out-of-network: 25-35% off in-store + OON reimbursement'},
+  {store:'Robert Marc',loc:'4 Manhattan locations (Madison Ave, Bleecker)',vsp:false,phone:'',url:'https://robertmarc.com/',brands:['Chrome Hearts','Oliver Peoples','Tom Ford','Barton Perreira','Garrett Leight','Mykita','ic! berlin']},
+  {store:'Morgenthal Frederics',loc:'Columbus Circle, Manhattan',vsp:false,phone:'',url:'https://morgenthalfrederics.com/',brands:['Chrome Hearts','Lindberg','ic! berlin','Mykita','Barton Perreira']},
+  {store:'10/10 Optics',loc:'50 Madison Ave, Flatiron',vsp:false,phone:'212-366-1010',url:'https://1010optics.com/',brands:['Barton Perreira','Rollo','Hoffman','Wesley Knight','Adam Mugavero','Lucas De Stael','Rigards','Deloor']},
+  {store:'Optical Illusions',loc:'377 Santana Row, San Jose, CA (remote orders OK)',vsp:true,phone:'408-502-5020',url:'https://opti-illusions.com/',brands:['Chrome Hearts','Gucci','Cartier','Zero G'],note:'Only VSP in-network Chrome Hearts provider. Ships remotely with your Rx.'},
+];
+
+function jasSearch(){
+  const q=document.getElementById('jasInput').value.trim().toLowerCase();
+  const out=document.getElementById('jasResults');
+  if(!q){out.innerHTML='';return;}
+  const matches=JAS_DB.filter(s=>s.brands.some(b=>b.toLowerCase().includes(q))).sort((a,b)=>(b.vsp?1:0)-(a.vsp?1:0));
+  if(!matches.length){
+    out.innerHTML=`<div class="card"><div style="color:var(--text2);font-size:13px;">No stores found for "${q}". Try Eurovision Optical — they can order most brands through wholesale distributors.</div></div>`;
+    return;
+  }
+  // calc VSP cost for a typical frame in this brand
+  const brandRow=matches[0].brands.find(b=>b.toLowerCase().includes(q));
+  out.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:8px;">${matches.length} store${matches.length>1?'s':''} found for "${brandRow||q}"</div>`+
+    matches.map(s=>{
+      const vspBadge=s.vsp
+        ?'<span class="vsp-badge vsp-yes">VSP In-Network</span>'
+        :'<span class="vsp-badge vsp-oon">Not VSP / OON</span>';
+      const matchedBrands=s.brands.filter(b=>b.toLowerCase().includes(q));
+      const otherBrands=s.brands.filter(b=>!b.toLowerCase().includes(q)).slice(0,6);
+      const note=s.note?`<div class="note" style="margin-top:6px;">${s.note}</div>`:'';
+      const links=[];
+      if(s.phone)links.push(`<a href="tel:${s.phone.replace(/\D/g,'')}">${s.phone}</a>`);
+      if(s.url)links.push(`<a href="${s.url}" target="_blank">Website</a>`);
+      return`<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <h3>${s.store}</h3>${vspBadge}
+        </div>
+        <div class="loc">${s.loc}</div>
+        <div class="brands" style="margin-top:6px;">
+          ${matchedBrands.map(b=>`<span class="tag want">${b}</span>`).join('')}
+          ${otherBrands.map(b=>`<span class="tag">${b}</span>`).join('')}
+          ${s.brands.length>matchedBrands.length+6?`<span class="tag">+${s.brands.length-matchedBrands.length-6} more</span>`:''}
+        </div>
+        ${note}
+        ${links.length?`<div class="actions" style="margin-top:6px;">${links.join('')}</div>`:''}
+      </div>`;
+    }).join('');
+}
 function tc(s){return s?s.split(' ').map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join(' '):''}
 function fp(p){if(!p)return'';const d=p.replace(/\D/g,'');return d.length===10?d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6):p}
 
