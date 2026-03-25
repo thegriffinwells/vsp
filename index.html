@@ -92,6 +92,25 @@
     .cmp .p { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 3px; }
     .cmp .o { font-size: 11px; color: var(--text2); margin-top: 1px; }
 
+    /* Chrome Hearts tab */
+    .ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .ch-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
+    .ch-card:hover { border-color: #444; }
+    .ch-card .imgs { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: #fff; }
+    .ch-card .imgs::-webkit-scrollbar { height: 0; }
+    .ch-card .imgs img { width: 100%; min-width: 100%; height: 200px; object-fit: contain; scroll-snap-align: start; background: #fff; padding: 8px; }
+    .ch-card .info { padding: 12px 14px; }
+    .ch-card .model { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .ch-card .color { font-size: 12px; color: var(--text2); }
+    .ch-card .specs { font-size: 11px; color: var(--text2); margin-top: 6px; }
+    .ch-card .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; }
+    .ch-card .retail { font-size: 13px; color: var(--text2); }
+    .ch-card .vsp-price { font-size: 15px; font-weight: 700; color: var(--green); }
+    .ch-dots { display: flex; justify-content: center; gap: 4px; padding: 6px 0; }
+    .ch-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+    .ch-dots span.active { background: var(--accent); }
+    .ch-card .scroll-hint { font-size: 10px; color: var(--text2); text-align: center; padding: 2px 0 6px; }
+
     /* Search */
     .search-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
     .search-bar input { flex: 1; min-width: 100px; }
@@ -123,15 +142,216 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="picks">Best Picks</button>
+    <button class="tab active" data-tab="chrome">Chrome Hearts</button>
+    <button class="tab" data-tab="picks">Best Picks</button>
     <button class="tab" data-tab="bk">Brooklyn</button>
     <button class="tab" data-tab="brands">Brand Guide</button>
     <button class="tab" data-tab="calc">Calculator</button>
     <button class="tab" data-tab="search">VSP Search</button>
   </div>
 
+  <!-- ============ CHROME HEARTS ============ -->
+  <div id="chrome" class="panel active">
+    <div class="callout green">
+      <h4>Your Chrome Hearts Shortlist from Optical Illusions (San Jose)</h4>
+      <p>25+ styles in stock. Remote order confirmed — they'll ship with your Rx. Swipe each card to see multiple angles. Try them on at <strong>755 Washington St</strong> (2 min from your office), then order through Optical Illusions on VSP.</p>
+    </div>
+
+    <div class="ch-grid">
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/5e1451859763c9f4d32826a780a520df.jpg" alt="Box Officer front">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/5a54fb7519163f342956286c325ab650.jpg" alt="Box Officer side">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/cfe608971b32ab4db616a7c829b37d30.jpg" alt="Box Officer detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">BOX OFFICER</div>
+          <div class="color">Black</div>
+          <div class="specs">Square frame · Acetate · Sterling silver hardware · Made in Japan</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/e2024b5ee97aec1eacb188d2a9e025eb.jpg" alt="Ripping front">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/72531c4f4b4e0862c9afe914deb79750.jpg" alt="Ripping side">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/67bb84d0ba4ce1b23544ee823a55c0c0.jpg" alt="Ripping detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">RIPPING</div>
+          <div class="color">Matte Black</div>
+          <div class="specs">Made in Japan · Sterling silver accents</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://viamanzoni.com/cdn/shop/files/Chrome_Hearts_Chirp_Chirp_Eyewear_CHIRP_CHIRP_BK_91bf3ba0-f610-4e6a-8922-b750afc7a285.jpg?v=1745372561" alt="Chirp Chirp front">
+          <img src="https://viamanzoni.com/cdn/shop/files/Chrome_Hearts_Chirp_Chirp_Eyewear_CHIRP_CHIRP_BK_1_dc2561ba-3bfa-44ab-9e1a-b5695f1ba089.jpg?v=1745372561" alt="Chirp Chirp angle">
+          <img src="https://groupie.store/cdn/shop/files/DSF0689.jpg?v=1721163822" alt="Chirp Chirp detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">CHIRP CHIRP</div>
+          <div class="color">Black</div>
+          <div class="specs">49mm · Bold square · Sterling silver crosses + fleur-de-lis · ~$1,984–$2,750</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn.modesens.com/availability/chrome-hearts-pills-iii---shiny-silver-sunglasses-92959135?w=1024" alt="Pills III">
+        </div>
+        <div class="info">
+          <div class="model">PILLS III</div>
+          <div class="color">Shiny Silver</div>
+          <div class="specs">55-20-144 · Rimless · Titanium · Gold/silver floral cross · ~$1,500+</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://requestboutique.com/cdn/shop/files/g1_86a1ad60-5d30-4d1d-8e9d-c88c964a133f.png?v=1770764252" alt="Stiffilis front">
+          <img src="https://requestboutique.com/cdn/shop/files/g2_2f62c175-5423-4019-9333-687469944e75.png?v=1770764252" alt="Stiffilis side">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">STIFFILIS</div>
+          <div class="color">Bordello</div>
+          <div class="specs">Acetate · Sterling silver details · Made in Japan</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://justinreed.com/cdn/shop/files/1_ef398012-a5e3-4fba-85f8-7c2f6762e8f0.jpg?v=1759460228" alt="Sluntradiction front">
+          <img src="https://justinreed.com/cdn/shop/files/2_c068f62a-cf69-4ebb-aa35-c1e1a8a0a0a3.jpg?v=1691097157" alt="Sluntradiction side">
+          <img src="https://justinreed.com/cdn/shop/files/3_f8010bbf-afa0-4fc1-af7d-b0b9d11fadfc.jpg?v=1691097156" alt="Sluntradiction detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">SLUNTRADICTION</div>
+          <div class="color">P.Cock / GP</div>
+          <div class="specs">Titanium · Gold plated · Iconic CH design · ~$750–$3,400</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn.modesens.com/availability/chrome-hearts-slidn---black-rx-glasses-91688332?w=1024" alt="SLID'N front">
+          <img src="https://shengliroadmarket.com/cdn/shop/files/chrome-hearts-slidn-bk-glasses-frame-2230823.jpg?v=1765187589" alt="SLID'N side">
+          <img src="https://shengliroadmarket.com/cdn/shop/files/chrome-hearts-slidn-bk-glasses-frame-8855827.jpg?v=1765187589" alt="SLID'N detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">SLID'N</div>
+          <div class="color">Black</div>
+          <div class="specs">53-18-142 · Square · Acetate · 925 silver details · ~$1,900</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://onlyauthentics.com/cdn/shop/files/OAshoot12-18-25_7.jpg?v=1769117777" alt="Free Ride front">
+          <img src="https://onlyauthentics.com/cdn/shop/files/OAshoot12-18-25_8.jpg?v=1769117778" alt="Free Ride side">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">FREE RIDE</div>
+          <div class="color">Sand</div>
+          <div class="specs">Acetate · Sterling silver accents · Bold silhouette · ~$1,600</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://gemopticians.com/cdn/shop/files/1_e2447bf8-36b2-42d8-bf04-022f12cdb1b3_1024x.jpg?v=1770812631" alt="Disco Stick">
+        </div>
+        <div class="info">
+          <div class="model">DISCO STICK</div>
+          <div class="color">Shiny Black</div>
+          <div class="specs">59mm · Sterling silver CH hardware · ~$1,600+</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn.modesens.com/availability/chrome-hearts-thirst-trap---black-rx-glasses-91688330?w=1024" alt="Thirst Trap">
+        </div>
+        <div class="info">
+          <div class="model">THIRST TRAP</div>
+          <div class="color">Black</div>
+          <div class="specs">55-19-146 · Square · Acetate · 925 silver temples · ~$3,276</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://groupie.store/cdn/shop/files/DSC05120.jpg?v=1759680390" alt="Cox Ucker front">
+          <img src="https://groupie.store/cdn/shop/files/DSC05117.jpg?v=1759680390" alt="Cox Ucker angle">
+          <img src="https://requestboutique.com/cdn/shop/files/111_fab90dec-93f6-405a-b206-725bdb4dd2dd.jpg?v=1708450665" alt="Cox Ucker detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">COX UCKER</div>
+          <div class="color">Black</div>
+          <div class="specs">52-19-153 · Rectangle · Floral cross silver · Exposed wire core · ~$1,500–$1,800</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/923a2bd043842f0d753b80b9d58904ed.jpg" alt="Crypdic front">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/85301defb2ca23453f13a3e403d85869.jpg" alt="Crypdic side">
+          <img src="https://cdn-images.italist.com/image/upload/t_medium_dpr_2_q_auto_v_2,f_auto/5ccf6c6208dbdb768cc808abe328dad2.jpg" alt="Crypdic detail">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">CRYPDIC</div>
+          <div class="color">Black</div>
+          <div class="specs">51-22-142 · Rectangle · Matte acetate · Dark silver cross · ~$1,422–$2,078</div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="imgs">
+          <img src="https://vintzshop.com/cdn/shop/files/0504B19D-F11C-41F7-9F9F-835EA303B39C.png?v=1750949468" alt="Trititsagain front">
+          <img src="https://vintzshop.com/cdn/shop/files/C841BC2D-0DF2-4D66-9736-DBB3A5F3BF57.png?v=1750949470" alt="Trititsagain side">
+        </div>
+        <div class="scroll-hint">swipe for more</div>
+        <div class="info">
+          <div class="model">TRITITSAGAIN</div>
+          <div class="color">Black / Silver</div>
+          <div class="specs">53-22-150 · Acetate · Silver hardware · Made in Japan</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:8px;">VSP Cost on Chrome Hearts</h3>
+      <div class="brow"><span class="l">Example: $1,500 retail frame</span><span class="v"></span></div>
+      <div class="brow sav"><span class="l">VSP allowance</span><span class="v">-$130</span></div>
+      <div class="brow"><span class="l">Overage: $1,370</span><span class="v"></span></div>
+      <div class="brow sav"><span class="l">20% overage discount</span><span class="v">-$274</span></div>
+      <div class="brow"><span class="l">Copays (frame + lens)</span><span class="v">$50</span></div>
+      <div class="brow total"><span class="l">You pay</span><span class="v">$1,146</span></div>
+      <div class="brow sav"><span class="l">With FSA/HSA (~30%)</span><span class="v">$802 effective</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-top:8px;">Savings vs buying retail + separate lenses: ~$600+. Order through Optical Illusions (San Jose) — 408.502.5020</div>
+    </div>
+
+    <div class="callout blue" style="margin-top:12px;">
+      <h4>Try On in NYC</h4>
+      <p><strong>Chrome Hearts Meatpacking</strong> — 755 Washington St (2 min from your office at 837 Washington). Call 212-327-0707 to make an appointment. Mon-Sat 11am-7pm. Find your style + model name, then order through Optical Illusions on VSP.</p>
+      <p style="margin-top:4px;"><strong>Also:</strong> Chinatown Optical (40 Mott St, walk-in OK, 7 days) · Robert Marc (4 Manhattan locations) · Morgenthal Frederics (Columbus Circle)</p>
+    </div>
+  </div>
+
   <!-- ============ BEST PICKS ============ -->
-  <div id="picks" class="panel active">
+  <div id="picks" class="panel">
     <div class="callout green">
       <h4>TL;DR — Your Best Moves</h4>
       <p><strong>For Gucci/BV/Prada:</strong> Milan Optique (Brooklyn, VSP only) or LensCrafters (Gucci + BV confirmed). <strong>For Chrome Hearts:</strong> Optical Illusions. <strong>For the Reddit hack:</strong> Eurovision Optical (Broadway & 37th). <strong>Best overall selection + VSP:</strong> Studio Optix (5,000+ frames, Loewe, Chanel, Tom Ford).</p>
